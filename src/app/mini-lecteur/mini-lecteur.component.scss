@@ -1,0 +1,167 @@
+:host {
+  display: block;
+}
+
+.mini {
+  position: relative;
+  height: var(--ms-hauteur-mini-lecteur);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 16px;
+  padding: 0 clamp(8px, 2vw, 20px);
+  padding-bottom: env(safe-area-inset-bottom);
+  background: color-mix(in srgb, var(--ms-fond-eleve) 88%, transparent);
+  backdrop-filter: saturate(160%) blur(18px);
+  border-top: 1px solid var(--ms-bordure);
+  box-shadow: 0 -6px 24px rgb(0 0 0 / 10%);
+  animation: montee 260ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes montee {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+// Barre d'avancement collée au bord supérieur ; le curseur transparent la rend déplaçable.
+.progression {
+  position: absolute;
+  inset: -2px 0 auto 0;
+  height: 4px;
+  background: color-mix(in srgb, var(--ms-bordure) 70%, transparent);
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--avance, 0%);
+    background: linear-gradient(90deg, var(--mat-sys-primary), var(--mat-sys-tertiary));
+    border-radius: 0 2px 2px 0;
+  }
+
+  &:hover {
+    height: 6px;
+    top: -3px;
+  }
+}
+
+.curseur {
+  position: absolute;
+  inset: -8px 0;
+  width: 100%;
+  height: calc(100% + 16px);
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: var(--ms-rayon-m);
+  background: none;
+  color: inherit;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ms-carte);
+  }
+}
+
+.pochette {
+  width: 52px;
+  flex: none;
+  --ms-rayon-m: 10px;
+}
+
+.texte {
+  display: grid;
+  min-width: 0;
+}
+
+.titre {
+  font: var(--mat-sys-title-small);
+  font-weight: 600;
+}
+
+.artiste {
+  font: var(--mat-sys-body-small);
+  color: var(--ms-texte-doux);
+}
+
+.egaliseur {
+  flex: none;
+}
+
+.controles {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.lecture {
+  margin: 0 6px;
+}
+
+.extras {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+  color: var(--ms-texte-doux);
+}
+
+.temps {
+  margin-right: 8px;
+  font: var(--mat-sys-label-medium);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 96px;
+    accent-color: var(--ms-accent);
+  }
+}
+
+@media (max-width: 1100px) {
+  .temps {
+    display: none;
+  }
+}
+
+// Mobile : pochette, titre, lecture, suivant et fermeture seulement.
+@media (max-width: 719.98px) {
+  .mini {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 4px;
+    padding-left: 6px;
+  }
+
+  .large-seulement {
+    display: none !important;
+  }
+
+  .pochette {
+    width: 44px;
+  }
+
+  .egaliseur {
+    display: none;
+  }
+
+  .lecture {
+    margin: 0 2px;
+  }
+}

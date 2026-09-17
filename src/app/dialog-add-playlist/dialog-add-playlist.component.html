@@ -1,0 +1,22 @@
+<h2 mat-dialog-title>Nouvelle playlist</h2>
+<mat-dialog-content>
+  <p class="aide">Donnez un nom à votre playlist, vous pourrez y ajouter des titres depuis leur carte.</p>
+  <mat-form-field appearance="outline" class="champ">
+    <mat-label>Nom de la playlist</mat-label>
+    <input
+      matInput
+      maxlength="120"
+      [ngModel]="playlistName()"
+      (ngModelChange)="playlistName.set($event)"
+      (keydown)="handleEnter($event.code)"
+      cdkFocusInitial
+    />
+    @if (nomDejaPris()) {
+      <mat-hint class="texte-danger">Une playlist porte déjà ce nom</mat-hint>
+    }
+  </mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button mat-dialog-close>Annuler</button>
+  <button mat-flat-button (click)="addPlaylist()" [disabled]="!peutValider()">Créer</button>
+</mat-dialog-actions>

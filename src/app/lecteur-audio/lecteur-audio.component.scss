@@ -1,0 +1,278 @@
+:host {
+  display: block;
+}
+
+.lecteur {
+  display: grid;
+  gap: 24px;
+  max-width: 760px;
+  margin: 0 auto;
+
+  &.avec-file {
+    max-width: 1180px;
+    grid-template-columns: minmax(0, 1.4fr) minmax(280px, 1fr);
+    align-items: start;
+  }
+}
+
+.scene {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  padding: clamp(18px, 4vw, 36px);
+  border-radius: var(--ms-rayon-l);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--ms-carte);
+}
+
+// La pochette floutée en arrière-plan donne sa couleur à toute la scène.
+.fond {
+  position: absolute;
+  inset: -20%;
+  z-index: -1;
+  filter: blur(60px) saturate(140%);
+  opacity: 0.45;
+  pointer-events: none;
+
+  app-pochette {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.media {
+  display: grid;
+  place-items: center;
+}
+
+.grande-pochette {
+  width: min(340px, 72vw);
+  border-radius: var(--ms-rayon-l);
+  box-shadow: var(--ms-ombre-forte);
+  transition: transform 400ms cubic-bezier(0.2, 0, 0, 1);
+  --ms-rayon-m: var(--ms-rayon-l);
+
+  &.en-pause {
+    transform: scale(0.94);
+  }
+}
+
+.video {
+  width: 100%;
+  max-height: 60vh;
+  border-radius: var(--ms-rayon-m);
+  background: #000;
+  box-shadow: var(--ms-ombre-forte);
+}
+
+.infos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.infos-texte {
+  min-width: 0;
+}
+
+.titre {
+  font-size: clamp(1.5rem, 3.4vw, 2.2rem);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.artiste {
+  margin-top: 6px;
+  font: var(--mat-sys-body-large);
+  color: var(--ms-texte-doux);
+}
+
+.note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grandes-etoiles {
+  --taille-etoile: 22px;
+}
+
+.description {
+  color: var(--ms-texte-doux);
+}
+
+.erreur {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ms-danger);
+}
+
+// Curseurs natifs habillés : la partie déjà jouée prend la couleur du thème.
+input[type='range'] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  margin: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--ms-accent) var(--avance, 0%),
+    color-mix(in srgb, var(--ms-texte) 18%, transparent) var(--avance, 0%)
+  );
+  cursor: pointer;
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--ms-accent);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 30%);
+  }
+
+  &::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--ms-accent);
+  }
+}
+
+.progression {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 12px;
+  font: var(--mat-sys-label-medium);
+  font-variant-numeric: tabular-nums;
+  color: var(--ms-texte-doux);
+
+  span:last-child {
+    text-align: right;
+  }
+}
+
+.controles {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(4px, 2vw, 16px);
+}
+
+.saut mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+}
+
+.lecture {
+  width: 68px;
+  height: 68px;
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+  }
+}
+
+.volume {
+  display: flex;
+  align-items: center;
+  justify-self: center;
+  gap: 8px;
+  width: 100%;
+  max-width: 260px;
+  color: var(--ms-texte-doux);
+}
+
+.file {
+  position: sticky;
+  top: calc(var(--ms-hauteur-barre) + 16px);
+  max-height: calc(100dvh - var(--ms-hauteur-barre) - 48px);
+  overflow-y: auto;
+  padding: 18px 10px 10px;
+  border: 1px solid var(--ms-bordure);
+  border-radius: var(--ms-rayon-l);
+  background: var(--ms-fond-eleve);
+}
+
+.file-titre {
+  padding: 0 10px 10px;
+  font: var(--mat-sys-title-medium);
+  font-weight: 700;
+}
+
+.file-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.file-ligne {
+  display: grid;
+  grid-template-columns: 28px 44px minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 6px 10px;
+  border: 0;
+  border-radius: var(--ms-rayon-s);
+  background: none;
+  color: var(--ms-texte);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--ms-carte);
+  }
+
+  &.actif {
+    background: var(--mat-sys-secondary-container);
+
+    .file-texte span {
+      color: var(--ms-accent);
+      font-weight: 600;
+    }
+  }
+}
+
+.file-rang {
+  display: grid;
+  place-items: center;
+  color: var(--ms-texte-doux);
+  font-variant-numeric: tabular-nums;
+}
+
+.file-pochette {
+  width: 44px;
+  --ms-rayon-m: 8px;
+}
+
+.file-texte {
+  display: grid;
+  min-width: 0;
+
+  small {
+    color: var(--ms-texte-doux);
+  }
+}
+
+@media (max-width: 959.98px) {
+  .lecteur.avec-file {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .file {
+    position: static;
+    max-height: none;
+  }
+}

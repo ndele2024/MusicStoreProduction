@@ -1,0 +1,78 @@
+@if (titre(); as piste) {
+  <div class="mini" role="region" aria-label="Lecteur en cours">
+    <div class="progression" [style.--avance]="progression() + '%'">
+      @if (!estVideo()) {
+        <input
+          type="range"
+          class="curseur"
+          min="0"
+          step="0.1"
+          [max]="duration() || 0"
+          [value]="currentTime()"
+          (input)="deplacer($event)"
+          aria-label="Position dans le titre"
+        />
+      }
+    </div>
+
+    <button class="info" (click)="ouvrirLecteur()" [attr.aria-label]="'Ouvrir le lecteur : ' + piste.name">
+      <app-pochette class="pochette" [graine]="piste.id" [icone]="estVideo() ? 'movie' : 'music_note'" />
+      <span class="texte">
+        <span class="titre tronque">{{ piste.name }}</span>
+        <span class="artiste tronque" [class.texte-danger]="erreur()">
+          {{ erreur() || piste.artisteNom || 'Artiste inconnu' }}
+        </span>
+      </span>
+      @if (isPlaying()) {
+        <app-lecture-en-cours class="egaliseur" />
+      }
+    </button>
+
+    <div class="controles">
+      <button mat-icon-button class="large-seulement" (click)="precedent()" [disabled]="!aPrecedent()" aria-label="Titre précédent">
+        <mat-icon>skip_previous</mat-icon>
+      </button>
+      <button
+        mat-mini-fab
+        class="lecture"
+        (click)="lecturePause()"
+        [attr.aria-label]="estVideo() ? 'Ouvrir la vidéo' : isPlaying() ? 'Pause' : 'Lecture'"
+        [matTooltip]="estVideo() ? 'Ouvrir la vidéo' : ''"
+      >
+        <mat-icon>{{ estVideo() ? 'smart_display' : isPlaying() ? 'pause' : 'play_arrow' }}</mat-icon>
+      </button>
+      <button mat-icon-button (click)="suivant()" [disabled]="!aSuivant()" aria-label="Titre suivant">
+        <mat-icon>skip_next</mat-icon>
+      </button>
+      <button mat-icon-button class="large-seulement" (click)="arreter()" matTooltip="Arrêter" aria-label="Arrêter la lecture">
+        <mat-icon>stop</mat-icon>
+      </button>
+    </div>
+
+    <div class="extras">
+      @if (!estVideo()) {
+        <span class="temps large-seulement">{{ currentTime() | duree }} / {{ duration() | duree }}</span>
+        <div class="volume large-seulement">
+          <button mat-icon-button (click)="basculerMuet()" [attr.aria-label]="muet() ? 'Rétablir le son' : 'Couper le son'">
+            <mat-icon>{{ iconeVolume() }}</mat-icon>
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.01"
+            [value]="muet() ? 0 : volume()"
+            (input)="changerVolume($event)"
+            aria-label="Volume"
+          />
+        </div>
+      }
+      <button mat-icon-button class="large-seulement" (click)="ouvrirLecteur()" matTooltip="Ouvrir le lecteur" aria-label="Ouvrir le lecteur">
+        <mat-icon>open_in_full</mat-icon>
+      </button>
+      <button mat-icon-button (click)="fermer()" matTooltip="Fermer le lecteur" aria-label="Fermer le lecteur">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+}

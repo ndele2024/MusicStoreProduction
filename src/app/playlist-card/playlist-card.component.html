@@ -1,0 +1,40 @@
+<article class="carte" [class.en-lecture]="enLecture()">
+  <div class="visuel">
+    <button class="ouvrir" (click)="goToDetail()" [attr.aria-label]="'Voir le détail de ' + titre()">
+      <app-pochette [graine]="graine()" [icone]="estAlbum() ? 'album' : 'queue_music'" />
+    </button>
+    <button
+      mat-fab
+      class="bouton-lecture"
+      (click)="openLecteur()"
+      [matTooltip]="enLecture() ? 'Revenir au lecteur' : 'Tout lire'"
+      [attr.aria-label]="enLecture() ? 'Revenir au lecteur' : 'Lire ' + titre()"
+    >
+      @if (enLecture()) {
+        <app-lecture-en-cours class="egaliseur" />
+      } @else {
+        <mat-icon>play_arrow</mat-icon>
+      }
+    </button>
+  </div>
+
+  <button class="texte ouvrir" (click)="goToDetail()">
+    <span class="titre tronque" [title]="titre()">{{ titre() }}</span>
+    <span class="artiste tronque">{{ description() }}</span>
+  </button>
+
+  <div class="actions">
+    @if (estAlbum()) {
+      <button mat-icon-button (click)="saveAlbum()" matTooltip="Sauvegarder tout l'album" aria-label="Sauvegarder tout l'album">
+        <mat-icon>library_add</mat-icon>
+      </button>
+    } @else {
+      <button mat-icon-button (click)="deletePlaylist()" matTooltip="Supprimer la playlist" aria-label="Supprimer la playlist">
+        <mat-icon>delete_outline</mat-icon>
+      </button>
+    }
+    <button mat-icon-button (click)="goToDetail()" matTooltip="Voir les titres" aria-label="Voir les titres">
+      <mat-icon>format_list_bulleted</mat-icon>
+    </button>
+  </div>
+</article>

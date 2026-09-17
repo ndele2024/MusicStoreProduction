@@ -1,0 +1,115 @@
+:host {
+  display: block;
+}
+
+.lien-evitement {
+  position: absolute;
+  left: 12px;
+  top: -48px;
+  z-index: 100;
+  padding: 8px 14px;
+  border-radius: var(--ms-rayon-s);
+  background: var(--ms-accent);
+  color: var(--ms-sur-accent);
+  text-decoration: none;
+
+  &:focus {
+    top: 12px;
+  }
+}
+
+.coquille {
+  min-height: 100dvh;
+  display: grid;
+  grid-template-columns: var(--ms-largeur-menu) minmax(0, 1fr);
+  grid-template-rows: var(--ms-hauteur-barre) 1fr;
+  grid-template-areas:
+    'barre barre'
+    'menu contenu';
+}
+
+.coquille-barre {
+  grid-area: barre;
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.coquille-menu {
+  grid-area: menu;
+  position: sticky;
+  top: var(--ms-hauteur-barre);
+  height: calc(100dvh - var(--ms-hauteur-barre));
+  overflow-y: auto;
+  border-right: 1px solid var(--ms-bordure);
+  background: var(--ms-fond);
+}
+
+.avec-mini .coquille-menu {
+  height: calc(100dvh - var(--ms-hauteur-barre) - var(--ms-hauteur-mini-lecteur));
+}
+
+.coquille-contenu {
+  grid-area: contenu;
+  min-width: 0;
+  outline: none;
+}
+
+.avec-mini .coquille-contenu {
+  padding-bottom: var(--ms-hauteur-mini-lecteur);
+}
+
+.coquille-mini {
+  position: fixed;
+  inset: auto 0 0 0;
+  z-index: 30;
+}
+
+.voile {
+  display: none;
+}
+
+// Petits écrans : le menu devient un tiroir coulissant au-dessus du contenu.
+@media (max-width: 959.98px) {
+  .coquille {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      'barre'
+      'contenu';
+  }
+
+  .coquille-menu,
+  .avec-mini .coquille-menu {
+    position: fixed;
+    inset: 0 auto 0 0;
+    width: min(300px, 86vw);
+    height: 100dvh;
+    z-index: 40;
+    border-right: 0;
+    background: var(--ms-fond-eleve);
+    box-shadow: var(--ms-ombre-forte);
+    transform: translateX(-104%);
+    transition: transform 240ms cubic-bezier(0.2, 0, 0, 1);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .menu-ouvert .coquille-menu {
+    transform: none;
+  }
+
+  .voile {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: rgb(0 0 0 / 45%);
+    backdrop-filter: blur(2px);
+    animation: apparition 200ms ease-out;
+  }
+}
+
+@keyframes apparition {
+  from {
+    opacity: 0;
+  }
+}

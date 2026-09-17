@@ -1,0 +1,110 @@
+// Socle visuel commun aux cartes de titre et d'album ou de playlist.
+
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.carte {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 10px 10px 4px;
+  border-radius: var(--ms-rayon-l);
+  background: var(--ms-fond-eleve);
+  transition: background var(--ms-transition), box-shadow var(--ms-transition), transform var(--ms-transition);
+
+  &:hover,
+  &:focus-within {
+    background: var(--ms-carte);
+    box-shadow: var(--ms-ombre);
+  }
+}
+
+.visuel {
+  position: relative;
+}
+
+// Bouton de lecture posé sur la pochette : visible au survol, toujours visible au doigt
+// et pendant la lecture.
+.bouton-lecture {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  width: 48px;
+  height: 48px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity var(--ms-transition), transform var(--ms-transition);
+  box-shadow: var(--ms-ombre-forte);
+
+  .egaliseur {
+    color: var(--mat-sys-on-primary-container);
+  }
+}
+
+.carte:hover .bouton-lecture,
+.carte:focus-within .bouton-lecture,
+.en-lecture .bouton-lecture {
+  opacity: 1;
+  transform: none;
+}
+
+@media (hover: none) {
+  .bouton-lecture {
+    opacity: 1;
+    transform: none;
+    width: 42px;
+    height: 42px;
+  }
+}
+
+.texte {
+  display: grid;
+  gap: 2px;
+  padding: 10px 4px 0;
+  min-width: 0;
+}
+
+.titre {
+  font: var(--mat-sys-title-small);
+  font-weight: 600;
+}
+
+.en-lecture .titre {
+  color: var(--ms-accent);
+}
+
+.artiste {
+  font: var(--mat-sys-body-small);
+  color: var(--ms-texte-doux);
+}
+
+
+
+
+.actions {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 2px;
+  color: var(--ms-texte-doux);
+
+  .actif {
+    color: var(--ms-accent);
+  }
+}
+
+@media (max-width: 599px) {
+  .carte {
+    padding: 8px 8px 2px;
+    border-radius: var(--ms-rayon-m);
+  }
+
+  .actions button {
+    --mdc-icon-button-state-layer-size: 36px;
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+  }
+}

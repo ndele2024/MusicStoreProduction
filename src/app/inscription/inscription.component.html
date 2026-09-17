@@ -1,0 +1,144 @@
+<app-cadre-auth>
+  <h1 class="titre">Créer un compte</h1>
+  <p class="sous-titre">Quelques informations et vous pourrez écouter toute la musique de MusicSpace.</p>
+
+  <ol class="etapes" aria-label="Progression de l'inscription">
+    @for (etape of etapes; track etape; let i = $index) {
+      <li [class.faite]="step() > i + 1" [class.active]="step() === i + 1" [attr.aria-current]="step() === i + 1 ? 'step' : null">
+        <span class="pastille-etape">
+          @if (step() > i + 1) {
+            <mat-icon>check</mat-icon>
+          } @else {
+            {{ i + 1 }}
+          }
+        </span>
+        <span class="libelle-etape">{{ etape }}</span>
+      </li>
+    }
+  </ol>
+
+  <form class="champs" [formGroup]="inscriptionForm" (submit)="$event.preventDefault(); step() === 4 ? submitForm() : nextStep()" novalidate>
+    @switch (step()) {
+      @case (1) {
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <mat-icon matPrefix>mail_outline</mat-icon>
+          <input matInput formControlName="email" type="email" autocomplete="email" inputmode="email" />
+          @if (inscriptionForm.get('email')?.invalid && inscriptionForm.get('email')?.touched) {
+            <mat-error>Adresse email invalide ou manquante</mat-error>
+          }
+        </mat-form-field>
+      }
+
+      @case (2) {
+        <mat-form-field appearance="outline">
+          <mat-label>Mot de passe</mat-label>
+          <mat-icon matPrefix>lock_outline</mat-icon>
+          <input
+            matInput
+            formControlName="password"
+            autocomplete="new-password"
+            [type]="masquerMotDePasse() ? 'password' : 'text'"
+          />
+          <button
+            type="button"
+            mat-icon-button
+            matSuffix
+            (click)="masquerMotDePasse.set(!masquerMotDePasse())"
+            [attr.aria-label]="masquerMotDePasse() ? 'Afficher le mot de passe' : 'Masquer le mot de passe'"
+          >
+            <mat-icon>{{ masquerMotDePasse() ? 'visibility_off' : 'visibility' }}</mat-icon>
+          </button>
+        </mat-form-field>
+        <ul class="regles">
+          @for (regle of reglesMotDePasse(); track regle.libelle) {
+            <li [class.ok]="regle.ok">
+              <mat-icon>{{ regle.ok ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              {{ regle.libelle }}
+            </li>
+          }
+        </ul>
+      }
+
+      @case (3) {
+        <mat-form-field appearance="outline">
+          <mat-label>Nom complet</mat-label>
+          <input matInput formControlName="name" autocomplete="name" />
+        </mat-form-field>
+        <div class="deux-colonnes">
+          <mat-form-field appearance="outline">
+            <mat-label>Nom d'utilisateur</mat-label>
+            <input matInput formControlName="username" autocomplete="username" />
+            @if (inscriptionForm.get('username')?.hasError('minlength')) {
+              <mat-error>3 caractères minimum</mat-error>
+            }
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Date de naissance</mat-label>
+            <input matInput formControlName="birthdate" type="date" autocomplete="bday" />
+          </mat-form-field>
+        </div>
+
+        <fieldset class="groupe">
+          <legend>Sexe</legend>
+          <mat-radio-group formControlName="gender" class="choix">
+            <mat-radio-button value="Homme">Homme</mat-radio-button>
+            <mat-radio-button value="Femme">Femme</mat-radio-button>
+            <mat-radio-button value="Binaire">Binaire</mat-radio-button>
+            <mat-radio-button value="Non défini">Non défini</mat-radio-button>
+          </mat-radio-group>
+        </fieldset>
+
+        <fieldset class="groupe">
+          <legend>Vous êtes</legend>
+          <mat-radio-group formControlName="role" class="roles">
+            <mat-radio-button value="auditeur" class="role">
+              <span class="role-texte"><mat-icon>headphones</mat-icon> Auditeur <small>J'écoute et je note</small></span>
+            </mat-radio-button>
+            <mat-radio-button value="artiste" class="role">
+              <span class="role-texte"><mat-icon>mic</mat-icon> Artiste <small>Je publie mes titres</small></span>
+            </mat-radio-button>
+          </mat-radio-group>
+        </fieldset>
+      }
+
+      @case (4) {
+        <dl class="recapitulatif">
+          <div><dt>Email</dt><dd>{{ inscriptionForm.value?.email }}</dd></div>
+          <div><dt>Nom</dt><dd>{{ inscriptionForm.value?.name }}</dd></div>
+          <div><dt>Nom d'utilisateur</dt><dd>{{ inscriptionForm.value?.username }}</dd></div>
+          <div><dt>Date de naissance</dt><dd>{{ inscriptionForm.value?.birthdate }}</dd></div>
+          <div><dt>Sexe</dt><dd>{{ inscriptionForm.value?.gender }}</dd></div>
+          <div><dt>Rôle</dt><dd class="capitalise">{{ inscriptionForm.value?.role }}</dd></div>
+        </dl>
+      }
+    }
+
+    @if (erreur()) {
+      <div class="alerte" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ erreur() }}</span>
+      </div>
+    }
+
+    <div class="navigation-etapes">
+      @if (step() > 1) {
+        <button mat-stroked-button type="button" (click)="prevStep()">
+          <mat-icon>arrow_back</mat-icon>
+          Retour
+        </button>
+      }
+      @if (step() < 4) {
+        <button mat-flat-button type="submit" [disabled]="!isStepValid()">
+          Continuer
+        </button>
+      } @else {
+        <button mat-flat-button type="submit" [disabled]="enCours()">
+          {{ enCours() ? 'Création…' : 'Créer mon compte' }}
+        </button>
+      }
+    </div>
+  </form>
+
+  <p class="bascule">Déjà inscrit ? <a routerLink="/login">Se connecter</a></p>
+</app-cadre-auth>

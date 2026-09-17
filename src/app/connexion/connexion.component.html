@@ -1,0 +1,49 @@
+<app-cadre-auth>
+  <h1 class="titre">Bon retour parmi nous</h1>
+  <p class="sous-titre">Connectez-vous pour écouter, noter et retrouver vos playlists.</p>
+
+  <form class="champs" (submit)="$event.preventDefault(); authenticateUser()" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>Email</mat-label>
+      <mat-icon matPrefix>mail_outline</mat-icon>
+      <input matInput type="email" autocomplete="email" inputmode="email" [formControl]="emailFormControl" />
+      @if (emailFormControl.hasError('required')) {
+        <mat-error>L'email est requis</mat-error>
+      } @else if (emailFormControl.hasError('email')) {
+        <mat-error>Adresse email invalide</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Mot de passe</mat-label>
+      <mat-icon matPrefix>lock_outline</mat-icon>
+      <input matInput autocomplete="current-password" [type]="hide() ? 'password' : 'text'" [formControl]="passwordFormControl" />
+      <button
+        type="button"
+        mat-icon-button
+        matSuffix
+        (click)="clickEvent($event)"
+        [attr.aria-label]="hide() ? 'Afficher le mot de passe' : 'Masquer le mot de passe'"
+        [attr.aria-pressed]="!hide()"
+      >
+        <mat-icon>{{ hide() ? 'visibility_off' : 'visibility' }}</mat-icon>
+      </button>
+      @if (passwordFormControl.hasError('required')) {
+        <mat-error>Le mot de passe est requis</mat-error>
+      }
+    </mat-form-field>
+
+    @if (erorMessage()) {
+      <div class="alerte" role="alert">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ erorMessage() }}</span>
+      </div>
+    }
+
+    <button mat-flat-button type="submit" class="principal" [disabled]="enCours()">
+      {{ enCours() ? 'Connexion…' : 'Se connecter' }}
+    </button>
+  </form>
+
+  <p class="bascule">Pas encore de compte ? <a routerLink="/signin">Créer un compte</a></p>
+</app-cadre-auth>

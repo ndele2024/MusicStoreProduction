@@ -1,0 +1,271 @@
+<div class="page">
+  @switch (section()) {
+    @case ('accueil') {
+      <section class="hero">
+        <div class="hero-texte">
+          <p class="hero-surtitre">MusicSpace</p>
+          <h1 class="hero-titre">{{ salutation() }}</h1>
+          <p class="hero-sous-titre">Les dernières sorties de vos artistes, prêtes à être écoutées.</p>
+          <div class="hero-actions">
+            <button mat-flat-button (click)="toutEcouter(nouveautes())" [disabled]="nouveautes().length === 0">
+              <mat-icon>play_arrow</mat-icon>
+              Tout écouter
+            </button>
+            <a mat-stroked-button routerLink="/nouveautes">Explorer les nouveautés</a>
+          </div>
+        </div>
+        <div class="hero-decor" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+      </section>
+
+      <div class="entete-section">
+        <h2>Nouveautés</h2>
+        <a routerLink="/nouveautes">Tout voir</a>
+      </div>
+      <div class="rayon">
+        @if (chargement()) {
+          @for (_ of squelettes; track $index) {
+            <div class="squelette squelette-carte"></div>
+          }
+        } @else {
+          @for (titre of nouveautes(); track titre.id) {
+            <app-music-card [titre]="titre" />
+          } @empty {
+            <p class="texte-doux">Aucun titre publié pour le moment.</p>
+          }
+        }
+      </div>
+
+      <div class="entete-section">
+        <h2>Les plus écoutés</h2>
+      </div>
+      <div class="rayon">
+        @if (chargement()) {
+          @for (_ of squelettes; track $index) {
+            <div class="squelette squelette-carte"></div>
+          }
+        } @else {
+          @for (titre of populaires(); track titre.id) {
+            <app-music-card [titre]="titre" />
+          }
+        }
+      </div>
+
+      @if (albums().length > 0) {
+        <div class="entete-section">
+          <h2>Albums</h2>
+        </div>
+        <div class="rayon">
+          @for (album of albums(); track album.id) {
+            <app-playlist-card [album]="album" param="album" />
+          }
+        </div>
+      }
+    }
+
+    @case ('nouveautes') {
+      <header class="entete-page">
+        <div>
+          <h1 class="titre-page">Nouveautés</h1>
+          <p class="sous-titre-page">Les titres publiés récemment, du plus récent au plus ancien.</p>
+        </div>
+        @if (nouveautes().length > 0) {
+          <button mat-flat-button (click)="toutEcouter(nouveautes())">
+            <mat-icon>play_arrow</mat-icon>
+            Tout écouter
+          </button>
+        }
+      </header>
+      <div class="grille-cartes">
+        @if (chargement()) {
+          @for (_ of squelettes; track $index) {
+            <div class="squelette squelette-carte"></div>
+          }
+        } @else {
+          @for (titre of nouveautes(); track titre.id) {
+            <app-music-card [titre]="titre" />
+          }
+        }
+      </div>
+      @if (!chargement() && nouveautes().length === 0) {
+        <div class="etat-vide">
+          <mat-icon>new_releases</mat-icon>
+          <h3>Rien de neuf pour l'instant</h3>
+          <p>Les titres publiés par les artistes apparaîtront ici.</p>
+        </div>
+      }
+    }
+
+    @case ('recherche') {
+      @if (requete() === '') {
+        <header class="entete-page">
+          <div>
+            <h1 class="titre-page">Rechercher</h1>
+            <p class="sous-titre-page">Tapez un titre, un album, un genre ou une année dans la barre du haut.</p>
+          </div>
+        </header>
+        @if (genres().length > 0) {
+          <div class="entete-section">
+            <h2>Parcourir par genre</h2>
+          </div>
+          <div class="genres">
+            @for (genre of genres(); track genre) {
+              <button class="genre" (click)="rechercherGenre(genre)">{{ genre }}</button>
+            }
+          </div>
+        }
+      } @else {
+        <header class="entete-page">
+          <div>
+            <p class="sous-titre-page">Résultats pour</p>
+            <h1 class="titre-page">« {{ requete() }} »</h1>
+          </div>
+        </header>
+
+        @if (rechercheEnCours()) {
+          <div class="grille-cartes">
+            @for (_ of squelettes; track $index) {
+              <div class="squelette squelette-carte"></div>
+            }
+          </div>
+        } @else if (aucunResultat()) {
+          <div class="etat-vide">
+            <mat-icon>search_off</mat-icon>
+            <h3>Aucun résultat</h3>
+            <p>Vérifiez l'orthographe ou essayez un autre mot-clé.</p>
+          </div>
+        } @else {
+          @if (resultatsTitres().length > 0) {
+            <div class="entete-section">
+              <h2>Titres</h2>
+              <span class="texte-doux">{{ resultatsTitres().length }}</span>
+            </div>
+            <div class="grille-cartes">
+              @for (titre of resultatsTitres(); track titre.id) {
+                <app-music-card [titre]="titre" />
+              }
+            </div>
+          }
+          @if (resultatsAlbums().length > 0) {
+            <div class="entete-section">
+              <h2>Albums</h2>
+            </div>
+            <div class="grille-cartes">
+              @for (album of resultatsAlbums(); track album.id) {
+                <app-playlist-card [album]="album" param="album" />
+              }
+            </div>
+          }
+          @if (resultatsPlaylists().length > 0) {
+            <div class="entete-section">
+              <h2>Vos playlists</h2>
+            </div>
+            <div class="grille-cartes">
+              @for (playlist of resultatsPlaylists(); track playlist.id) {
+                <app-playlist-card [playlist]="playlist" param="playlist" />
+              }
+            </div>
+          }
+        }
+      }
+    }
+
+    @case ('historique') {
+      <header class="entete-page">
+        <div>
+          <h1 class="titre-page">Historique</h1>
+          <p class="sous-titre-page">{{ historique().length }} titre(s) écouté(s), le plus récent en premier.</p>
+        </div>
+        @if (historique().length > 0) {
+          <div class="entete-actions">
+            <button mat-flat-button (click)="toutEcouter(historique())">
+              <mat-icon>play_arrow</mat-icon>
+              Réécouter
+            </button>
+            <button mat-stroked-button (click)="viderHistorique()" [disabled]="videEnCours()">
+              <mat-icon>delete_sweep</mat-icon>
+              Vider l'historique
+            </button>
+          </div>
+        }
+      </header>
+      @if (historique().length === 0) {
+        <div class="etat-vide">
+          <mat-icon>history</mat-icon>
+          <h3>Aucun titre écouté</h3>
+          <p>Les titres que vous écoutez s'afficheront ici.</p>
+          <a mat-flat-button routerLink="/home">Découvrir le catalogue</a>
+        </div>
+      } @else {
+        <div class="grille-cartes">
+          @for (titre of historique(); track titre.id) {
+            <app-music-card [titre]="titre" param="historique" />
+          }
+        </div>
+      }
+    }
+
+    @case ('sauvegardes') {
+      <header class="entete-page">
+        <div>
+          <h1 class="titre-page">Sauvegardes</h1>
+          <p class="sous-titre-page">{{ sauvegardes().length }} titre(s) mis de côté.</p>
+        </div>
+        @if (sauvegardes().length > 0) {
+          <div class="entete-actions">
+            <button mat-flat-button (click)="toutEcouter(sauvegardes())">
+              <mat-icon>play_arrow</mat-icon>
+              Tout écouter
+            </button>
+            <button mat-stroked-button (click)="viderSauvegardes()" [disabled]="videEnCours()">
+              <mat-icon>delete_sweep</mat-icon>
+              Vider les sauvegardes
+            </button>
+          </div>
+        }
+      </header>
+      @if (sauvegardes().length === 0) {
+        <div class="etat-vide">
+          <mat-icon>bookmark_border</mat-icon>
+          <h3>Aucune sauvegarde</h3>
+          <p>Touchez l'icône marque-page d'un titre pour le retrouver ici.</p>
+          <a mat-flat-button routerLink="/home">Découvrir le catalogue</a>
+        </div>
+      } @else {
+        <div class="grille-cartes">
+          @for (titre of sauvegardes(); track titre.id) {
+            <app-music-card [titre]="titre" param="sauvegarde" />
+          }
+        </div>
+      }
+    }
+
+    @case ('playlists') {
+      <header class="entete-page">
+        <div>
+          <h1 class="titre-page">Playlists</h1>
+          <p class="sous-titre-page">{{ playlists().length }} playlist(s).</p>
+        </div>
+        <button mat-flat-button (click)="nouvellePlaylist()">
+          <mat-icon>add</mat-icon>
+          Nouvelle playlist
+        </button>
+      </header>
+      @if (playlists().length === 0) {
+        <div class="etat-vide">
+          <mat-icon>queue_music</mat-icon>
+          <h3>Aucune playlist</h3>
+          <p>Créez une playlist puis ajoutez-y des titres depuis leur carte.</p>
+          <button mat-flat-button (click)="nouvellePlaylist()">Créer une playlist</button>
+        </div>
+      } @else {
+        <div class="grille-cartes">
+          @for (playlist of playlists(); track playlist.id) {
+            <app-playlist-card [playlist]="playlist" param="playlist" />
+          }
+        </div>
+      }
+    }
+  }
+</div>

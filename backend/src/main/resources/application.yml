@@ -1,0 +1,76 @@
+server:
+  port: ${SERVER_PORT:8080}
+  compression:
+    enabled: true
+    mime-types: application/json,application/xml,text/plain
+  error:
+    include-stacktrace: never
+
+spring:
+  application:
+    name: musicstore-api
+
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/musicstore}
+    username: ${SPRING_DATASOURCE_USERNAME:musicstore}
+    password: ${SPRING_DATASOURCE_PASSWORD:musicstore}
+    hikari:
+      maximum-pool-size: 10
+      pool-name: musicstore-pool
+
+  jpa:
+    # Le schema appartient a Flyway ; Hibernate se contente de verifier qu'il correspond au mapping.
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+          batch_size: 30
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+  servlet:
+    multipart:
+      # Abaissable en production : une demo publique n'a pas besoin de 200 Mo
+      # par fichier, et le disque du VPS n'est pas extensible.
+      max-file-size: ${MUSICSTORE_MAX_FILE_SIZE:200MB}
+      max-request-size: ${MUSICSTORE_MAX_REQUEST_SIZE:210MB}
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: never
+
+musicstore:
+  jwt:
+    # A remplacer imperativement en production via MUSICSTORE_JWT_SECRET.
+    secret: ${MUSICSTORE_JWT_SECRET:dev-secret-musicstore-a-remplacer-en-production-32-octets-minimum}
+    expiration: ${MUSICSTORE_JWT_EXPIRATION:43200}
+    issuer: musicstore
+  cors:
+    allowed-origins: ${MUSICSTORE_CORS_ORIGINS:http://localhost:[*],http://127.0.0.1:[*]}
+  storage:
+    location: ${MUSICSTORE_STORAGE_LOCATION:./media}
+    max-file-size-bytes: 209715200
+    seed-on-startup: true
+  seed:
+    enabled: ${MUSICSTORE_SEED_ENABLED:true}
+
+logging:
+  level:
+    com.musicstore: INFO
+    org.hibernate.SQL: ${LOG_SQL:WARN}

@@ -1,0 +1,78 @@
+@let t = titreAffiche();
+<article class="carte" [class.en-lecture]="enLecture()">
+  <div class="visuel">
+    <app-pochette [graine]="t.id" [icone]="icone()" />
+    @if (t.mediaType === 'video') {
+      <span class="pastille type">Vidéo</span>
+    }
+    <button
+      mat-fab
+      class="bouton-lecture"
+      (click)="openLecteur()"
+      [matTooltip]="enLecture() ? 'Revenir au lecteur' : 'Lire'"
+      [attr.aria-label]="enLecture() ? 'Revenir au lecteur' : 'Lire ' + t.name"
+    >
+      @if (enLecture()) {
+        <app-lecture-en-cours class="egaliseur" />
+      } @else {
+        <mat-icon>play_arrow</mat-icon>
+      }
+    </button>
+  </div>
+
+  <div class="texte">
+    <h3 class="titre tronque" [title]="t.name">{{ t.name }}</h3>
+    <p class="artiste tronque">{{ t.artisteNom || 'Artiste inconnu' }} · {{ t.annee }}</p>
+    @if (t.description) {
+      <p class="description" [title]="t.description">{{ t.description }}</p>
+    }
+    <div class="meta">
+      <app-etoiles [note]="t.noteMoyenne" [maNote]="t.maNote" [interactif]="true" (noter)="noter($event)" />
+      <span class="vues">{{ t.vues | vues }}</span>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button mat-icon-button [matMenuTriggerFor]="menuPlaylist" matTooltip="Ajouter à une playlist" aria-label="Ajouter à une playlist">
+      <mat-icon>playlist_add</mat-icon>
+    </button>
+    <mat-menu #menuPlaylist="matMenu">
+      <button mat-menu-item (click)="openDialog()">
+        <mat-icon>add</mat-icon>
+        <span>Nouvelle playlist</span>
+      </button>
+      @if (playlists().length > 0) {
+        <mat-divider />
+      }
+      @for (p of playlists(); track p.id) {
+        <button mat-menu-item (click)="addToPlaylist(p)" [disabled]="isInPlaylist(p)">
+          <mat-icon>{{ isInPlaylist(p) ? 'check' : 'queue_music' }}</mat-icon>
+          <span>{{ p.nom }}</span>
+        </button>
+      }
+    </mat-menu>
+
+    @if (param() === 'sauvegarde') {
+      <button mat-icon-button (click)="deleteToSauvegarde()" matTooltip="Retirer des sauvegardes" aria-label="Retirer des sauvegardes">
+        <mat-icon>bookmark_remove</mat-icon>
+      </button>
+    } @else {
+      <button
+        mat-icon-button
+        (click)="sauvegarderTitre()"
+        [disabled]="estSauvegarde()"
+        [class.actif]="estSauvegarde()"
+        [matTooltip]="estSauvegarde() ? 'Déjà sauvegardé' : 'Sauvegarder'"
+        [attr.aria-label]="estSauvegarde() ? 'Déjà sauvegardé' : 'Sauvegarder'"
+      >
+        <mat-icon>{{ estSauvegarde() ? 'bookmark' : 'bookmark_add' }}</mat-icon>
+      </button>
+    }
+
+    @if (param() === 'historique') {
+      <button mat-icon-button (click)="retirerDeHistorique()" matTooltip="Retirer de l'historique" aria-label="Retirer de l'historique">
+        <mat-icon>history_toggle_off</mat-icon>
+      </button>
+    }
+  </div>
+</article>

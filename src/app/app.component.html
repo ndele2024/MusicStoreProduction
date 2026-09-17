@@ -1,0 +1,29 @@
+@if (pleinEcran()) {
+  <router-outlet />
+} @else {
+  <a class="lien-evitement" href="#contenu">Aller au contenu</a>
+
+  <div class="coquille" [class.menu-ouvert]="menuOuvert()" [class.avec-mini]="miniLecteurVisible()">
+    <app-toolbar class="coquille-barre" [estMobile]="estMobile()" (basculerMenu)="menuOuvert.set(!menuOuvert())" />
+
+    <aside
+      class="coquille-menu"
+      aria-label="Navigation principale"
+      [attr.inert]="estMobile() && !menuOuvert() ? '' : null"
+    >
+      <app-menu-lateral [tiroir]="estMobile()" (fermer)="menuOuvert.set(false)" />
+    </aside>
+
+    @if (estMobile() && menuOuvert()) {
+      <div class="voile" (click)="menuOuvert.set(false)" aria-hidden="true"></div>
+    }
+
+    <main class="coquille-contenu" id="contenu" tabindex="-1">
+      <router-outlet />
+    </main>
+
+    @if (miniLecteurVisible()) {
+      <app-mini-lecteur class="coquille-mini" />
+    }
+  </div>
+}

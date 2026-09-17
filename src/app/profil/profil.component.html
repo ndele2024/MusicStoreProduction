@@ -1,0 +1,81 @@
+<div class="page">
+  <div class="profil">
+    <header class="banniere">
+      <div class="avatar" aria-hidden="true">{{ initiales() }}</div>
+      <div class="identite">
+        <span class="pastille capitalise">{{ user()?.role }}</span>
+        <h1 class="titre-page">{{ user()?.fullName }}</h1>
+        <p class="texte-doux">&#64;{{ user()?.userName }}</p>
+      </div>
+    </header>
+
+    <section class="carte-profil">
+      <div class="carte-entete">
+        <div>
+          <h2>Informations personnelles</h2>
+          <p class="texte-doux">Ces informations sont visibles uniquement par vous.</p>
+        </div>
+        @if (!editMode()) {
+          <button mat-stroked-button (click)="activerEdition()">
+            <mat-icon>edit</mat-icon>
+            Modifier
+          </button>
+        }
+      </div>
+
+      <form class="champs" [formGroup]="form" (submit)="$event.preventDefault(); enregistrerModifications()">
+        <mat-form-field appearance="outline">
+          <mat-label>Nom complet</mat-label>
+          <mat-icon matPrefix>badge</mat-icon>
+          <input matInput formControlName="fullName" autocomplete="name" />
+          @if (form.get('fullName')?.hasError('required')) {
+            <mat-error>Le nom est requis</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <mat-icon matPrefix>mail_outline</mat-icon>
+          <input matInput formControlName="userEmail" type="email" autocomplete="email" />
+          @if (form.get('userEmail')?.hasError('email')) {
+            <mat-error>Adresse email invalide</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nom d'utilisateur</mat-label>
+          <mat-icon matPrefix>alternate_email</mat-icon>
+          <input matInput [value]="user()?.userName" disabled />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Rôle</mat-label>
+          <mat-icon matPrefix>verified_user</mat-icon>
+          <input matInput class="capitalise" [value]="user()?.role" disabled />
+        </mat-form-field>
+
+        @if (erreur()) {
+          <div class="alerte" role="alert">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ erreur() }}</span>
+          </div>
+        }
+
+        @if (editMode()) {
+          <div class="actions">
+            <button mat-button type="button" (click)="annulerModifications()">Annuler</button>
+            <button mat-flat-button type="submit" [disabled]="enCours()">
+              {{ enCours() ? 'Enregistrement…' : 'Enregistrer' }}
+            </button>
+          </div>
+        }
+      </form>
+    </section>
+
+    <nav class="raccourcis" aria-label="Raccourcis">
+      <a routerLink="/sauvegardes" class="raccourci"><mat-icon>bookmark</mat-icon>Mes sauvegardes</a>
+      <a routerLink="/playlists" class="raccourci"><mat-icon>queue_music</mat-icon>Mes playlists</a>
+      <a routerLink="/historique" class="raccourci"><mat-icon>history</mat-icon>Mon historique</a>
+    </nav>
+  </div>
+</div>

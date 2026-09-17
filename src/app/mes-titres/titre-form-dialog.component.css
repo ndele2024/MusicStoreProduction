@@ -1,0 +1,63 @@
+.formulaire {
+  display: flex;
+  flex-direction: column;
+  min-width: min(520px, 80vw);
+  padding-top: 4px;
+}
+
+.pleine-largeur {
+  width: 100%;
+}
+
+.ligne {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.zone-fichier {
+  border: 1px dashed var(--ms-bordure);
+  border-radius: 10px;
+  padding: 12px 14px;
+  margin-top: 4px;
+}
+
+.zone-fichier-entete {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.zone-fichier-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.zone-fichier-entete mat-icon {
+  color: var(--ms-accent);
+}
+
+.fichier-titre {
+  font-weight: 600;
+}
+
+.aide {
+  font: var(--mat-sys-body-small);
+  color: var(--ms-texte-doux);
+}
+
+.espace-haut {
+  margin-top: 10px;
+}
+
+@media (max-width: 479.98px) {
+  .formulaire {
+    min-width: 0;
+  }
+
+  .ligne {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+}

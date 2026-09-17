@@ -1,0 +1,108 @@
+<h2 mat-dialog-title>{{ edition ? 'Modifier le titre' : 'Ajouter un titre' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="formulaire" (ngSubmit)="enregistrer()">
+    <mat-form-field class="pleine-largeur">
+      <mat-label>Titre</mat-label>
+      <input matInput formControlName="name" maxlength="160" cdkFocusInitial />
+      @if (form.controls.name.hasError('required')) {
+        <mat-error>Le titre est requis</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field class="pleine-largeur">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="2" maxlength="1000"></textarea>
+    </mat-form-field>
+
+    <div class="ligne">
+      <mat-form-field>
+        <mat-label>Genre</mat-label>
+        <input matInput formControlName="genre" maxlength="60" />
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Année</mat-label>
+        <input matInput type="number" formControlName="annee" min="1900" max="2100" />
+        @if (form.controls.annee.invalid) {
+          <mat-error>Entre 1900 et 2100</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field class="pleine-largeur">
+      <mat-label>Album</mat-label>
+      <mat-select formControlName="albumId">
+        <mat-option value="">Aucun, titre publié en single</mat-option>
+        @for (album of albums(); track album.id) {
+          <mat-option [value]="album.id">{{ album.name }} ({{ album.annee }})</mat-option>
+        }
+        <mat-option [value]="nouvelAlbum">
+          <mat-icon>add</mat-icon> Créer un nouvel album
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    @if (creeAlbum()) {
+      <div class="ligne">
+        <mat-form-field>
+          <mat-label>Nom du nouvel album</mat-label>
+          <input matInput formControlName="nouvelAlbumNom" maxlength="160" />
+          @if (form.controls.nouvelAlbumNom.hasError('required')) {
+            <mat-error>Le nom est requis</mat-error>
+          }
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Année de l'album</mat-label>
+          <input matInput type="number" formControlName="nouvelAlbumAnnee" min="1900" max="2100" />
+        </mat-form-field>
+      </div>
+    }
+
+    <div class="zone-fichier">
+      <div class="zone-fichier-entete">
+        <mat-icon>{{ fichier() ? 'task' : 'upload_file' }}</mat-icon>
+        <div>
+          <div class="fichier-titre">Fichier audio ou vidéo</div>
+          @if (fichier(); as f) {
+            <div class="aide">{{ f.name }} · {{ tailleLisible(f.size) }}</div>
+          } @else if (fichierActuel) {
+            <div class="aide">Actuel : {{ fichierActuel }}. Choisissez un fichier pour le remplacer.</div>
+          } @else {
+            <div class="aide">Sans fichier, le titre reste invisible pour les auditeurs.</div>
+          }
+        </div>
+      </div>
+      <div class="zone-fichier-actions">
+        <input #champFichier type="file" hidden [accept]="accept" (change)="choisirFichier($event)" />
+        <button mat-stroked-button type="button" (click)="champFichier.click()">
+          {{ fichier() || fichierActuel ? 'Changer' : 'Choisir un fichier' }}
+        </button>
+        @if (fichier()) {
+          <button mat-button type="button" (click)="retirerFichier()">Retirer</button>
+        }
+      </div>
+      @if (erreurFichier()) {
+        <div class="aide texte-danger espace-haut">{{ erreurFichier() }}</div>
+      }
+      <div class="aide espace-haut">MP3, WAV, OGG, M4A, FLAC, AAC, MP4, WEBM, MOV, MKV · 200 Mo max</div>
+    </div>
+
+    <button type="submit" hidden></button>
+  </form>
+
+  @if (enCours()) {
+    <mat-progress-bar mode="indeterminate" class="espace-haut"></mat-progress-bar>
+    <div class="aide espace-haut">{{ fichier() ? 'Envoi du fichier en cours…' : 'Enregistrement…' }}</div>
+  }
+  @if (erreur()) {
+    <p class="texte-danger espace-haut">{{ erreur() }}</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="annuler()" [disabled]="enCours()">Annuler</button>
+  <button mat-flat-button type="button" (click)="enregistrer()" [disabled]="enCours()">
+    {{ edition ? 'Enregistrer' : 'Ajouter' }}
+  </button>
+</mat-dialog-actions>

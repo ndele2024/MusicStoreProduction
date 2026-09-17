@@ -1,0 +1,20 @@
+@use '../_ui/carte';
+
+.ouvrir {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  border-radius: var(--ms-rayon-m);
+}
+
+// .ouvrir remet les boutons en bloc : le texte doit rester empilé sur deux lignes.
+button.texte {
+  display: grid;
+  padding: 10px 4px 0;
+}

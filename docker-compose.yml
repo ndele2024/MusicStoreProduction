@@ -1,0 +1,59 @@
+name: musicstore
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: musicstore-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-musicstore}
+      POSTGRES_USER: ${POSTGRES_USER:-musicstore}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-musicstore}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      # L'API n'est demarree qu'une fois la base reellement prete a accepter des connexions.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-musicstore} -d ${POSTGRES_DB:-musicstore}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build:
+      context: ./backend
+    container_name: musicstore-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-musicstore}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-musicstore}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:-musicstore}
+      MUSICSTORE_JWT_SECRET: ${MUSICSTORE_JWT_SECRET:-dev-secret-musicstore-a-remplacer-en-production-32-octets-minimum}
+      MUSICSTORE_CORS_ORIGINS: ${MUSICSTORE_CORS_ORIGINS:-http://localhost:[*],http://127.0.0.1:[*]}
+      MUSICSTORE_SEED_ENABLED: ${MUSICSTORE_SEED_ENABLED:-true}
+    ports:
+      - "${API_PORT:-8080}:8080"
+    volumes:
+      - media-data:/app/media
+    restart: unless-stopped
+
+  # Frontend Angular servi par nginx. Pour le developpement au quotidien, preferez
+  # « npm start » sur la machine hote et ne lancez ici que db et api.
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: musicstore-web
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-8081}:80"
+    restart: unless-stopped
+    profiles: ["full"]
+
+volumes:
+  db-data:
+  media-data:

@@ -1,0 +1,83 @@
+@if (tiroir()) {
+  <div class="tiroir-entete">
+    <app-marque />
+    <button mat-icon-button (click)="fermer.emit()" aria-label="Fermer le menu">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}
+
+<nav class="navigation">
+  <a class="lien" routerLink="/home" routerLinkActive="actif" [routerLinkActiveOptions]="{ exact: true }" (click)="fermer.emit()">
+    <mat-icon>home</mat-icon>
+    <span>Accueil</span>
+  </a>
+  <a class="lien" routerLink="/nouveautes" routerLinkActive="actif" (click)="fermer.emit()">
+    <mat-icon>new_releases</mat-icon>
+    <span>Nouveautés</span>
+  </a>
+  <a class="lien" routerLink="/recherche" routerLinkActive="actif" (click)="fermer.emit()">
+    <mat-icon>search</mat-icon>
+    <span>Rechercher</span>
+  </a>
+
+  <div class="groupe">Votre bibliothèque</div>
+  <a class="lien" routerLink="/historique" routerLinkActive="actif" (click)="fermer.emit()">
+    <mat-icon>history</mat-icon>
+    <span>Historique</span>
+    @if (isConnected()) {
+      <span class="compteur" [attr.aria-label]="nombreHistorique() + ' titres'">{{ nombreHistorique() }}</span>
+    }
+  </a>
+  <a class="lien" routerLink="/sauvegardes" routerLinkActive="actif" (click)="fermer.emit()">
+    <mat-icon>bookmark</mat-icon>
+    <span>Sauvegardes</span>
+    @if (isConnected()) {
+      <span class="compteur" [attr.aria-label]="nombreSauvegardes() + ' titres'">{{ nombreSauvegardes() }}</span>
+    }
+  </a>
+  <a class="lien" routerLink="/playlists" routerLinkActive="actif" (click)="fermer.emit()">
+    <mat-icon>queue_music</mat-icon>
+    <span>Playlists</span>
+    @if (isConnected()) {
+      <span class="compteur" [attr.aria-label]="nombrePlaylists() + ' playlists'">{{ nombrePlaylists() }}</span>
+    }
+  </a>
+
+  @if (isArtiste()) {
+    <div class="groupe">Espace artiste</div>
+    <a class="lien" routerLink="/mes-titres" routerLinkActive="actif" (click)="fermer.emit()">
+      <mat-icon>library_music</mat-icon>
+      <span>Gérer vos titres</span>
+    </a>
+  }
+</nav>
+
+@if (isConnected()) {
+  <section class="playlists" aria-label="Vos playlists">
+    <div class="playlists-entete">
+      <span class="groupe">Vos playlists</span>
+      <button mat-icon-button (click)="nouvellePlaylist()" matTooltip="Nouvelle playlist" aria-label="Nouvelle playlist">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+    @for (playlist of playlists(); track playlist.id) {
+      <button class="playlist" (click)="ouvrirPlaylist(playlist)">
+        <app-pochette class="playlist-pochette" [graine]="playlist.id" icone="queue_music" />
+        <span class="playlist-texte">
+          <span class="tronque">{{ playlist.nom }}</span>
+          <small>{{ playlist.titres.length }} titre(s)</small>
+        </span>
+      </button>
+    } @empty {
+      <p class="playlists-vide">Créez une playlist pour y ranger vos titres préférés.</p>
+    }
+  </section>
+} @else {
+  <div class="invitation">
+    <mat-icon>favorite</mat-icon>
+    <p>Connectez-vous pour noter, sauvegarder et créer vos playlists.</p>
+    <a mat-flat-button routerLink="/login" (click)="fermer.emit()">Se connecter</a>
+    <a mat-button routerLink="/signin" (click)="fermer.emit()">Créer un compte</a>
+  </div>
+}

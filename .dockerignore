@@ -1,0 +1,13 @@
+node_modules
+# Le Dockerfile racine ne construit que le front : inutile d'envoyer
+# les sources Java au demon Docker.
+backend
+dist
+.angular
+.git
+.idea
+.vscode
+backend/target
+backend/media
+media
+*.log

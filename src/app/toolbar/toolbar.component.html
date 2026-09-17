@@ -1,0 +1,114 @@
+<header class="barre" [class.recherche-mobile]="estMobile() && rechercheOuverte()">
+  @if (estMobile() && rechercheOuverte()) {
+    <button mat-icon-button (click)="fermerRecherche()" aria-label="Fermer la recherche">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  } @else {
+    @if (estMobile()) {
+      <button mat-icon-button (click)="basculerMenu.emit()" aria-label="Ouvrir le menu">
+        <mat-icon>menu</mat-icon>
+      </button>
+    }
+    <a class="lien-marque" routerLink="/home" aria-label="MusicSpace, accueil">
+      <app-marque [compacte]="estMobile()" />
+    </a>
+  }
+
+  @if (!estMobile() || rechercheOuverte()) {
+    <form class="recherche" role="search" (submit)="valider($event)">
+      <mat-icon class="recherche-icone" aria-hidden="true">search</mat-icon>
+      <input
+        #champRecherche
+        type="search"
+        class="recherche-champ"
+        placeholder="Titre, album, genre, année…"
+        aria-label="Rechercher dans le catalogue"
+        autocomplete="off"
+        enterkeyhint="search"
+        [value]="texte()"
+        (input)="onSaisie($event)"
+      />
+      @if (texte() !== '') {
+        <button type="button" mat-icon-button class="recherche-effacer" (click)="effacer()" aria-label="Effacer la recherche">
+          <mat-icon>close</mat-icon>
+        </button>
+      }
+    </form>
+  }
+
+  @if (!(estMobile() && rechercheOuverte())) {
+    <div class="actions">
+      @if (estMobile()) {
+        <button mat-icon-button (click)="ouvrirRecherche()" aria-label="Rechercher">
+          <mat-icon>search</mat-icon>
+        </button>
+      }
+
+      <button mat-icon-button [matMenuTriggerFor]="menuPreferences" matTooltip="Préférences" aria-label="Préférences">
+        <mat-icon>{{ theme.icone() }}</mat-icon>
+      </button>
+      <mat-menu #menuPreferences="matMenu" xPosition="before">
+        <div class="menu-titre">Thème</div>
+        @for (option of themes; track option.mode) {
+          <button mat-menu-item (click)="theme.choisir(option.mode)">
+            <mat-icon>{{ option.icone }}</mat-icon>
+            <span>{{ option.libelle }}</span>
+            @if (theme.mode() === option.mode) {
+              <mat-icon class="coche">check</mat-icon>
+            }
+          </button>
+        }
+        <mat-divider />
+        <div class="menu-titre">Langue</div>
+        @for (langue of ['Francais', 'Anglais']; track langue) {
+          <button mat-menu-item (click)="changeLanguage(langue)">
+            <mat-icon>translate</mat-icon>
+            <span>{{ langue === 'Francais' ? 'Français' : 'Anglais' }}</span>
+            @if (language() === langue) {
+              <mat-icon class="coche">check</mat-icon>
+            }
+          </button>
+        }
+      </mat-menu>
+
+      @if (isConnected()) {
+        <button
+          class="avatar"
+          [matMenuTriggerFor]="menuCompte"
+          [style.background]="avatarColor()"
+          [attr.aria-label]="'Compte de ' + (user()?.fullName ?? '')"
+        >
+          {{ avatarName() }}
+        </button>
+        <mat-menu #menuCompte="matMenu" xPosition="before" class="menu-compte">
+          <div class="compte-entete">
+            <div class="compte-nom tronque">{{ user()?.fullName }}</div>
+            <div class="compte-email tronque">{{ user()?.userEmail }}</div>
+            <span class="pastille">{{ user()?.role }}</span>
+          </div>
+          <mat-divider />
+          <a mat-menu-item routerLink="/profil">
+            <mat-icon>person</mat-icon>
+            <span>Mon profil</span>
+          </a>
+          @if (isArtiste()) {
+            <a mat-menu-item routerLink="/mes-titres">
+              <mat-icon>library_music</mat-icon>
+              <span>Gérer vos titres</span>
+            </a>
+          }
+          <mat-divider />
+          <button mat-menu-item (click)="deconnexion()">
+            <mat-icon>logout</mat-icon>
+            <span>Déconnexion</span>
+          </button>
+        </mat-menu>
+      } @else {
+        @if (!estMobile()) {
+          <a mat-button routerLink="/signin">S'inscrire</a>
+        }
+        <a mat-flat-button routerLink="/login">Se connecter</a>
+      }
+    </div>
+  }
+</header>

@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    # H2 en mode PostgreSQL : les migrations Flyway de production sont rejouees telles quelles,
+    # et « ddl-auto: validate » verifie qu'elles correspondent au mapping JPA.
+    url: jdbc:h2:mem:musicstore;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    clean-disabled: false
+
+musicstore:
+  jwt:
+    secret: secret-de-test-musicstore-suffisamment-long-pour-hs256
+    expiration: 3600
+    issuer: musicstore
+  cors:
+    allowed-origins: http://localhost:[*]
+  storage:
+    location: ./target/test-media
+    max-file-size-bytes: 10485760
+    seed-on-startup: false
+  seed:
+    # Chaque test construit ses propres donnees : le jeu de demonstration fausserait les assertions.
+    enabled: false
+
+logging:
+  level:
+    org.springframework.web: WARN
+    org.hibernate: WARN

@@ -1,0 +1,55 @@
+// Styles partagés par les formulaires de connexion et d'inscription.
+
+.titre {
+  font-size: clamp(1.7rem, 3vw, 2.2rem);
+  line-height: 1.15;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.sous-titre {
+  margin: 8px 0 28px;
+  color: var(--ms-texte-doux);
+}
+
+.champs {
+  display: grid;
+  gap: 4px;
+
+  mat-form-field {
+    width: 100%;
+  }
+}
+
+.alerte {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 4px 0 8px;
+  padding: 10px 14px;
+  border-radius: var(--ms-rayon-s);
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+}
+
+.principal {
+  width: 100%;
+  height: 48px;
+  margin-top: 8px;
+  font-size: 1rem;
+}
+
+.bascule {
+  margin-top: 24px;
+  text-align: center;
+  color: var(--ms-texte-doux);
+
+  a {
+    font-weight: 600;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}

@@ -1,0 +1,116 @@
+<div class="page">
+  <header class="entete">
+    <div>
+      <h1 class="titre-page">Gérer vos titres</h1>
+      <p class="sous-titre-page">Ajoutez, modifiez et publiez vos morceaux.</p>
+    </div>
+    <button mat-flat-button (click)="ajouter()">
+      <mat-icon>add</mat-icon>
+      Ajouter un titre
+    </button>
+  </header>
+
+  <div class="statistiques">
+    <div class="statistique">
+      <mat-icon>check_circle</mat-icon>
+      <strong>{{ nombrePublies() }}</strong>
+      <span>publié(s)</span>
+    </div>
+    <div class="statistique" [class.attention]="nombreEnAttente() > 0">
+      <mat-icon>schedule</mat-icon>
+      <strong>{{ nombreEnAttente() }}</strong>
+      <span>en attente de fichier</span>
+    </div>
+    <div class="statistique">
+      <mat-icon>visibility</mat-icon>
+      <strong>{{ vuesTotales() | vues }}</strong>
+      <span>au total</span>
+    </div>
+  </div>
+
+  @if (chargement()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+
+  @if (erreur()) {
+    <div class="alerte" role="alert">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ erreur() }}</span>
+      <button mat-button (click)="charger()">Réessayer</button>
+    </div>
+  }
+
+  @if (!chargement() && !erreur() && titres().length === 0) {
+    <div class="etat-vide">
+      <mat-icon>library_music</mat-icon>
+      <h3>Vous n'avez encore publié aucun titre</h3>
+      <p>Ajoutez un titre et déposez son fichier pour qu'il apparaisse dans le catalogue.</p>
+      <button mat-flat-button (click)="ajouter()">Ajouter mon premier titre</button>
+    </div>
+  }
+
+  @if (titres().length > 0) {
+    <ul class="liste">
+      @for (titre of titresTries(); track titre.id) {
+        <li class="ligne" [class.en-attente]="!titre.mediaUrl">
+          <app-pochette class="pochette" [graine]="titre.id" [icone]="titre.mediaType === 'video' ? 'movie' : 'music_note'" />
+
+          <div class="principal">
+            <div class="nom tronque">{{ titre.name }}</div>
+            <div class="details tronque">
+              {{ titre.albumNom || 'Single' }} · {{ titre.genre || 'Sans genre' }} · {{ titre.annee }}
+            </div>
+            @if (titre.description) {
+              <div class="description tronque">{{ titre.description }}</div>
+            }
+          </div>
+
+          <div class="statut">
+            @if (titre.mediaUrl) {
+              <span class="pastille succes">
+                <mat-icon>{{ titre.mediaType === 'video' ? 'movie' : 'graphic_eq' }}</mat-icon>
+                {{ titre.mediaType === 'video' ? 'Vidéo' : 'Audio' }}
+              </span>
+            } @else {
+              <span class="pastille attention"><mat-icon>schedule</mat-icon>En attente</span>
+            }
+          </div>
+
+          <div class="chiffres">
+            <span><mat-icon>visibility</mat-icon>{{ titre.vues | vues }}</span>
+            <span><mat-icon>star</mat-icon>{{ noteAffichee(titre) }}</span>
+          </div>
+
+          <div class="actions">
+            @if (titre.mediaUrl) {
+              <button mat-icon-button (click)="ecouter(titre)" [matTooltip]="enLecture(titre) ? 'Revenir au lecteur' : 'Écouter'" aria-label="Écouter">
+                @if (enLecture(titre)) {
+                  <app-lecture-en-cours />
+                } @else {
+                  <mat-icon>play_circle</mat-icon>
+                }
+              </button>
+            } @else {
+              <button mat-icon-button class="deposer" (click)="modifier(titre)" matTooltip="Déposer le fichier" aria-label="Déposer le fichier">
+                <mat-icon>upload_file</mat-icon>
+              </button>
+            }
+            <button mat-icon-button (click)="modifier(titre)" matTooltip="Modifier" aria-label="Modifier">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button
+              mat-icon-button
+              class="supprimer"
+              (click)="supprimer(titre)"
+              [disabled]="suppressionEnCours() === titre.id"
+              matTooltip="Supprimer"
+              aria-label="Supprimer"
+            >
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+        </li>
+      }
+    </ul>
+  }
+</div>

@@ -1,0 +1,41 @@
+@use '../_ui/carte';
+
+.type {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgb(0 0 0 / 55%);
+  color: #fff;
+  backdrop-filter: blur(6px);
+}
+
+.description {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin-top: 2px;
+  font: var(--mat-sys-body-small);
+  color: var(--ms-texte-doux);
+  opacity: 0.85;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px 8px;
+  margin-top: 6px;
+}
+
+.vues {
+  font: var(--mat-sys-label-small);
+  color: var(--ms-texte-doux);
+}
+
+@media (max-width: 599px) {
+  .description {
+    display: none;
+  }
+}

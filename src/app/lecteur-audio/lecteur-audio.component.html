@@ -1,0 +1,161 @@
+<div class="page">
+  @if (titre(); as piste) {
+    <div class="lecteur" [class.avec-file]="hasPlaylist()">
+      <section class="scene" aria-label="Lecture en cours">
+        <div class="fond" aria-hidden="true">
+          <app-pochette [graine]="piste.id" />
+        </div>
+
+        <div class="media">
+          @if (videoUrl(); as source) {
+            <video
+              #video
+              class="video"
+              [src]="source"
+              controls
+              playsinline
+              preload="metadata"
+              (loadedmetadata)="onVideoPrete($event)"
+              (play)="onVideoEtat($event)"
+              (pause)="onVideoEtat($event)"
+              (ended)="onVideoEtat($event)"
+              (timeupdate)="onVideoEtat($event)"
+            ></video>
+          } @else {
+            <app-pochette class="grande-pochette" [class.en-pause]="!isPlaying()" [graine]="piste.id" icone="music_note" />
+          }
+        </div>
+
+        <div class="infos">
+          <div class="infos-texte">
+            <h1 class="titre">{{ piste.name }}</h1>
+            <p class="artiste">
+              {{ piste.artisteNom || 'Artiste inconnu' }}
+              @if (piste.albumNom) {
+                · {{ piste.albumNom }}
+              }
+              · {{ piste.annee }}
+            </p>
+          </div>
+          <div class="note">
+            <app-etoiles
+              class="grandes-etoiles"
+              [note]="piste.noteMoyenne"
+              [maNote]="piste.maNote"
+              [interactif]="true"
+              (noter)="noter($event)"
+            />
+            <span class="texte-doux">{{ piste.vues | vues }}</span>
+          </div>
+        </div>
+
+        @if (piste.description) {
+          <p class="description">{{ piste.description }}</p>
+        }
+
+        @if (erreur(); as message) {
+          <p class="erreur" role="alert"><mat-icon>error_outline</mat-icon>{{ message }}</p>
+        }
+
+        @if (!videoUrl()) {
+          <div class="progression">
+            <span>{{ currentTime() | duree }}</span>
+            <input
+              type="range"
+              min="0"
+              step="0.1"
+              [max]="duration() || 0"
+              [value]="currentTime()"
+              [style.--avance]="progression() + '%'"
+              (input)="seekAudio($event)"
+              aria-label="Position de lecture"
+            />
+            <span>{{ duration() | duree }}</span>
+          </div>
+        }
+
+        <div class="controles">
+          <button
+            mat-icon-button
+            (click)="repeatTrack()"
+            [disabled]="!!videoUrl()"
+            matTooltip="Reprendre au début"
+            aria-label="Reprendre au début"
+          >
+            <mat-icon>replay</mat-icon>
+          </button>
+          <button mat-icon-button class="saut" (click)="previousTrack()" [disabled]="!aPrecedent()" aria-label="Titre précédent">
+            <mat-icon>skip_previous</mat-icon>
+          </button>
+          @if (!videoUrl()) {
+            <button mat-fab class="lecture" (click)="togglePlayPause()" [attr.aria-label]="isPlaying() ? 'Pause' : 'Lecture'">
+              <mat-icon>{{ isPlaying() ? 'pause' : 'play_arrow' }}</mat-icon>
+            </button>
+          }
+          <button mat-icon-button class="saut" (click)="nextTrack()" [disabled]="!aSuivant()" aria-label="Titre suivant">
+            <mat-icon>skip_next</mat-icon>
+          </button>
+          <button mat-icon-button (click)="arreter()" matTooltip="Arrêter" aria-label="Arrêter la lecture">
+            <mat-icon>stop</mat-icon>
+          </button>
+        </div>
+
+        @if (!videoUrl()) {
+          <div class="volume">
+            <button mat-icon-button (click)="basculerMuet()" [attr.aria-label]="muet() ? 'Rétablir le son' : 'Couper le son'">
+              <mat-icon>{{ iconeVolume() }}</mat-icon>
+            </button>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.01"
+              [value]="muet() ? 0 : volume()"
+              [style.--avance]="(muet() ? 0 : volume() * 100) + '%'"
+              (input)="changeVolume($event)"
+              aria-label="Volume"
+            />
+          </div>
+        }
+      </section>
+
+      @if (hasPlaylist()) {
+        <aside class="file" aria-label="File d'attente">
+          <h2 class="file-titre">File d'attente <span class="texte-doux">{{ playlist().length }}</span></h2>
+          <ol class="file-liste">
+            @for (t of playlist(); track t.id; let i = $index) {
+              <li>
+                <button
+                  class="file-ligne"
+                  [class.actif]="estCourant(t)"
+                  (click)="selectTrack(t)"
+                  [attr.aria-current]="estCourant(t) ? 'true' : null"
+                >
+                  <span class="file-rang">
+                    @if (estCourant(t) && isPlaying()) {
+                      <app-lecture-en-cours />
+                    } @else {
+                      {{ i + 1 }}
+                    }
+                  </span>
+                  <app-pochette class="file-pochette" [graine]="t.id" [icone]="t.mediaType === 'video' ? 'movie' : 'music_note'" />
+                  <span class="file-texte">
+                    <span class="tronque">{{ t.name }}</span>
+                    <small class="tronque">{{ t.artisteNom || 'Artiste inconnu' }}</small>
+                  </span>
+                </button>
+              </li>
+            }
+          </ol>
+        </aside>
+      }
+    </div>
+  } @else {
+    <div class="etat-vide">
+      <mat-icon>headphones</mat-icon>
+      <h3>Aucun titre en cours</h3>
+      <p>Choisissez un titre dans le catalogue pour lancer la lecture.</p>
+      <a mat-flat-button routerLink="/home">Parcourir le catalogue</a>
+    </div>
+  }
+</div>

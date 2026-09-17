@@ -1,0 +1,90 @@
+<div class="detail">
+  <header class="entete">
+    <app-pochette class="pochette" [graine]="graine()" [icone]="estAlbum() ? 'album' : 'queue_music'" />
+    <div class="entete-texte">
+      <span class="type">{{ estAlbum() ? 'Album' : 'Playlist' }}</span>
+      <h2 class="nom" mat-dialog-title>{{ nom() || '…' }}</h2>
+      <p class="texte-doux">{{ sousTitre() }}</p>
+      <div class="entete-actions">
+        <button mat-flat-button (click)="openLecteur()" [disabled]="titres().length === 0">
+          @if (selectionEnLecture()) {
+            <app-lecture-en-cours class="egaliseur" />
+          } @else {
+            <mat-icon>play_arrow</mat-icon>
+          }
+          {{ selectionEnLecture() ? 'En cours' : 'Lecture' }}
+        </button>
+        @if (estAlbum()) {
+          <button mat-stroked-button (click)="sauvegarderTitres()" [disabled]="titres().length === 0">
+            <mat-icon>library_add</mat-icon>
+            Tout sauvegarder
+          </button>
+        }
+      </div>
+    </div>
+    <button mat-icon-button class="fermer" mat-dialog-close aria-label="Fermer">
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  <mat-dialog-content class="contenu">
+    @if (chargement()) {
+      @for (_ of [1, 2, 3]; track $index) {
+        <div class="squelette ligne-fantome"></div>
+      }
+    } @else {
+      <ol class="liste">
+        @for (titre of titres(); track titre.id; let i = $index) {
+          <li class="ligne" [class.actif]="enLecture(titre)">
+            <span class="rang">
+              @if (enLecture(titre)) {
+                <app-lecture-en-cours />
+              } @else {
+                {{ i + 1 }}
+              }
+            </span>
+            <app-pochette class="mini-pochette" [graine]="titre.id" [icone]="titre.mediaType === 'video' ? 'movie' : 'music_note'" />
+            <span class="ligne-texte">
+              <span class="tronque ligne-nom">{{ titre.name }}</span>
+              <small class="tronque texte-doux">{{ titre.artisteNom || 'Artiste inconnu' }} · {{ titre.genre }} · {{ titre.annee }}</small>
+            </span>
+            <span class="ligne-meta">
+              <app-etoiles [note]="titre.noteMoyenne" />
+              <small class="texte-doux">{{ titre.vues | vues }}</small>
+            </span>
+            <span class="ligne-actions">
+              <button
+                mat-icon-button
+                (click)="sauvegarderTitre(titre)"
+                [disabled]="isInSauvegarde(titre.id)"
+                [matTooltip]="isInSauvegarde(titre.id) ? 'Déjà sauvegardé' : 'Sauvegarder'"
+                aria-label="Sauvegarder"
+              >
+                <mat-icon>{{ isInSauvegarde(titre.id) ? 'bookmark' : 'bookmark_add' }}</mat-icon>
+              </button>
+              @if (!estAlbum()) {
+                <button mat-icon-button (click)="retirerDeLaPlaylist(titre)" matTooltip="Retirer de la playlist" aria-label="Retirer de la playlist">
+                  <mat-icon>playlist_remove</mat-icon>
+                </button>
+              }
+              <button
+                mat-icon-button
+                (click)="openLecteur(titre)"
+                [matTooltip]="enLecture(titre) ? 'Revenir au lecteur' : 'Lire'"
+                [attr.aria-label]="enLecture(titre) ? 'Revenir au lecteur' : 'Lire ' + titre.name"
+              >
+                <mat-icon>{{ enLecture(titre) ? 'graphic_eq' : 'play_circle' }}</mat-icon>
+              </button>
+            </span>
+          </li>
+        } @empty {
+          <li class="etat-vide">
+            <mat-icon>{{ estAlbum() ? 'album' : 'queue_music' }}</mat-icon>
+            <h3>Aucun titre</h3>
+            <p>{{ estAlbum() ? 'Cet album ne contient pas encore de titre lisible.' : 'Ajoutez des titres depuis leur carte avec le bouton playlist.' }}</p>
+          </li>
+        }
+      </ol>
+    }
+  </mat-dialog-content>
+</div>
